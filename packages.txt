@@ -1,3 +1,0 @@
-pymongo
-pydeck
-streamlit==1.1

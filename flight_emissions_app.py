@@ -30,8 +30,9 @@ db = client[databaseName]
 #read data from the database into dataframe
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)
 def get_flights_df():
-    st.write('Loading data for every major flight path in the world. Thank you for your patience!')
+    loading_message = st.write('Loading data for every major flight path in the world. Thank you for your patience!')
     return pd.DataFrame(list(db.final_flight_app.find({})))
+    loading_message.empty()
 
 
 flights = get_flights_df()

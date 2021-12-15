@@ -274,7 +274,9 @@ with col2:
 
 
 st.markdown('''
-   
+       
+          
+             
    All emissions data you see above was collected from the Climatiq.io API using US EPA standards for calculating flight emissions.
 
 ''')

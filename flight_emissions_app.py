@@ -51,7 +51,7 @@ st.markdown(
     
     
     ''')
-default_value = 'Please type or choose a location'
+default_value = 'Select or type location'
 #create lists of multiselect options to filter the map
 country_list= [default_value] + sorted(flights.dest_country_full.unique().astype(str))
 city_list = [default_value] + sorted(flights.origin_city.unique())

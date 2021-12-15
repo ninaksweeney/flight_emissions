@@ -18,12 +18,13 @@ password = 'hNfQXzFxrsDQGGbyH8KX'
 databaseName = 'bs8ntk4apfl7fga'
 
 # connect with authentication
-client = MongoClient(hostname, port)
+client = MongoClient(hostname, username=username, password=password, authSource = databaseName, 
+                    authMechanism = 'SCRAM-SHA-256')
 db = client[databaseName]
 
 
 #authenticate the database
-db.authenticate(username, password)
+# db.authenticate(username, password)
 
 
 #read data from the database into dataframe

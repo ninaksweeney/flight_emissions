@@ -23,16 +23,16 @@ client = MongoClient(hostname, username=username, password=password, authSource 
 db = client[databaseName]
 
 loading_message = st.empty()
-loading_message.markdown('Loading data for every major flight path in the world. Thank you for your patience!')
+loading_message.write('Loading data for every major flight path in the world. Thank you for your patience!')
 
 #read data from the database into dataframe
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)
-def get_flights_df():
+def fetching_flight_data():
     return pd.DataFrame(list(db.final_flight_app.find({})))
 
 
 loading_message.empty()
-flights = get_flights_df()
+flights = fetching_flight_data()
 
 #end data prep, begin building web app interactions
 

@@ -170,6 +170,16 @@ def format_display_df_origin(row):
             return f'{origin}'
         elif country_choice_1 in destination:
             return f'{destination}'
+    elif city_choice_2!= default_value:
+        if city_choice_2 in origin:
+            return f'{destination}'
+        elif city_choice_2 in destination:
+            return f'{origin}'
+    elif country_choice_2 != default_value:
+        if country_choice_2 in origin:
+            return f'{destination}'
+        elif country_choice_2 in destination:
+            return f'{origin}'
 @st.cache
 def format_display_df_dest(row):
     origin= f'{row[1]}, {row[2]}'

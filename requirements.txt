@@ -1,1 +1,4 @@
 python==3.8.12
+pymongo
+pydeck
+streamlit==1.1

@@ -194,6 +194,16 @@ def format_display_df_dest(row):
             return f'{destination}'
         elif country_choice_1 in destination:
             return f'{origin}'
+    elif city_choice_2!= default_value:
+        if city_choice_2 in origin:
+            return f'{origin}'
+        elif city_choice_2 in destination:
+            return f'{destination}'
+    elif country_choice_2 != default_value:
+        if country_choice_2 in origin:
+            return f'{origin}'
+        elif country_choice_2 in destination:
+            return f'{destination}'
 
 
 

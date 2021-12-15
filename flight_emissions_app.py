@@ -23,10 +23,8 @@ db = client[databaseName]
 
 
 #authenticate the database
-@st.cache
-def authenticate_db():
-    db.authenticate(username, password)
-authenticate_db()
+db.authenticate(username, password)
+
 
 #read data from the database into dataframe
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)

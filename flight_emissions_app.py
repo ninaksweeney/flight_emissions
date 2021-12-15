@@ -30,7 +30,7 @@ def get_flights_df():
     return pd.DataFrame(list(db.final_flight_app.find({})))
 
 
-loading_message.empty()
+loading_message = st.empty()
 flights = get_flights_df()
 
 #end data prep, begin building web app interactions

@@ -82,7 +82,7 @@ else:
     city_choice_2 = st.sidebar.selectbox('Destination City', city_list, index=0)
 
 
-user_emissions_limit = st.sidebar.slider('Per Passenger Emissions Limit (kg)', flights.formatted_co2e.min(), flights.formatted_co2e.max(), value=flights.formatted_co2e.max())
+user_emissions_limit = st.sidebar.slider('Per Passenger Emissions Limit (kg)', int(flights.formatted_co2e.min()), int(flights.formatted_co2e.max()), value=int(flights.formatted_co2e.max()))
 
 emissions_limit_filter = flights.formatted_co2e <= user_emissions_limit
 

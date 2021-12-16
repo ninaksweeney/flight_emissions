@@ -22,16 +22,12 @@ client = MongoClient(hostname, username=username, password=password, authSource 
                     authMechanism = 'SCRAM-SHA-256')
 db = client[databaseName]
 
-loading_message = st.empty()
-loading_message.write('Loading data for every major flight path in the world. Thank you for your patience!')
-
 #read data from the database into dataframe
 @st.cache(allow_output_mutation=True, suppress_st_warning=True)
 def fetching_flight_data():
     return pd.DataFrame(list(db.final_flight_app.find({})))
 
 
-loading_message.empty()
 flights = fetching_flight_data()
 
 #end data prep, begin building web app interactions
@@ -272,12 +268,12 @@ with col2:
     * Opt for direct flights instead of layovers
     ''')
 
+for i in range(6):  
+    st.text("")
 
-
-st.markdown('''
-       
-          
+st.markdown('''     
              
    All emissions data you see above was collected from the Climatiq.io API using US EPA standards for calculating flight emissions.
+   Airports included are designated 'large airports' by OurAirports.com, defined as a "land airport with scheduled major airline service with millions of passengers/year, or major military base."
 
 ''')

@@ -3,6 +3,7 @@ import streamlit as st
 import pymongo
 from pymongo import MongoClient
 import pydeck as pdk
+import config
 
 st.set_page_config(layout="wide")
 
@@ -14,7 +15,7 @@ client = MongoClient( uri )
 hostname = 'bs8ntk4apfl7fga-mongodb.services.clever-cloud.com'
 port = 27017
 username = 'urhejh70922nhwipt6kt'
-password = 'hNfQXzFxrsDQGGbyH8KX'
+password = config.db_password
 databaseName = 'bs8ntk4apfl7fga'
 
 # connect with authentication

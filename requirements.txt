@@ -1,3 +1,4 @@
 pymongo
 pydeck
+config
 streamlit==1.2

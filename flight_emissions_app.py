@@ -24,7 +24,7 @@ client = MongoClient(hostname, username=username, password=password, authSource 
 db = client[databaseName]
 
 #read data from the database into dataframe
-@st.cache(allow_output_mutation=True, suppress_st_warning=True)
+@st.cache(allow_output_mutation=True, suppress_st_warning=True, hash_funcs={"MyUnhashableClass": lambda _: None})
 def fetching_flight_data():
     return pd.DataFrame(list(db.final_flight_app.find({})))
 
@@ -154,7 +154,7 @@ deckchart = st.pydeck_chart(pdk.Deck(layers=[base_layer, arc_layer],
                                     initial_view_state= view_state,
                                     tooltip=tooltip_text))
 
-@st.cache
+@st.cache(ttl=5*60)
 def format_display_df_origin(row):
     origin= f'{row[1]}, {row[2]}'
     destination = f'{row[3]}, {row[4]}'
@@ -178,7 +178,7 @@ def format_display_df_origin(row):
             return f'{destination}'
         elif country_choice_2 in destination:
             return f'{origin}'
-@st.cache
+@st.cache(ttl=5*60)
 def format_display_df_dest(row):
     origin= f'{row[1]}, {row[2]}'
     destination = f'{row[3]}, {row[4]}'

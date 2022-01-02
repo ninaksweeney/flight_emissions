@@ -1,3 +1,18 @@
+''' This document is hosted on github and is the source for a Streamlit App. 
+The following code is broken into sections based on the user experience of the app. The sections
+are as follows:
+- Data Setup
+- Section 1: Intro & Welcome Text
+- Section 2: Dropdown pick lists and data filtering
+- Section 3: Map Setup
+- Section 4: Building the User Options Table
+- Section 5: Alternative actions
+'''
+
+
+
+
+# Data Setup
 import pandas as pd
 import streamlit as st
 import pymongo
@@ -5,6 +20,8 @@ from pymongo import MongoClient
 import pydeck as pdk
 import config
 
+#this will make the map stretch out wide when people are on bigger screens,
+#better user experience
 st.set_page_config(layout="wide")
 
 #connect to cloud Mongodb server
@@ -18,7 +35,7 @@ username = 'urhejh70922nhwipt6kt'
 password = st.secrets["db_password"]
 databaseName = 'bs8ntk4apfl7fga'
 
-# connect with authentication
+# authenticate the database
 client = MongoClient(hostname, username=username, password=password, authSource = databaseName, 
                     authMechanism = 'SCRAM-SHA-256')
 db = client[databaseName]
@@ -28,11 +45,16 @@ db = client[databaseName]
 def fetching_flight_data():
     return pd.DataFrame(list(db.final_flight_app.find({})))
 
-
+#this is the dataframe that will show up in map form on our app
 flights = fetching_flight_data()
 
-#end data prep, begin building web app interactions
+#end data setup, begin building web app interactions
 
+
+
+
+
+# Section 1: Intro and Welcome Text
 st.title('Welcome to Flight Impact!')
 st.markdown(
     '''
@@ -49,16 +71,21 @@ st.markdown(
     
     
     ''')
+
+
+
+# Section 2: Dropdown pick lists and data filtering
+
 default_value = 'Select or type location'
-#create lists of multiselect options to filter the map
+#create lists of multiselect options to filter the map - unique countries and cities
 country_list= [default_value] + sorted(flights.dest_country_full.unique().astype(str))
 city_list = [default_value] + sorted(flights.origin_city.unique())
 
 #create origin country multiselect
 country_choice_1 = st.sidebar.selectbox('Origin Country', country_list, index=0)
 
-#if country choice is full, filter city options to that country - 
-#else full list
+#if country choice is chosen already, filter city options to that country - 
+#else just show full list
 if country_choice_1 !=default_value:
     city_list1 = [default_value] + sorted(flights.origin_city[flights.origin_country_full==country_choice_1].unique())
     city_choice_1 = st.sidebar.selectbox('Origin City', city_list1, index=0)
@@ -68,8 +95,8 @@ else:
 #create destination country multiselect
 country_choice_2 = st.sidebar.selectbox('Destination Country', country_list, index=0)
 
-#if country choice is full, filter city options to that country - 
-#else full list
+#if country choice is already chosen, filter city options to that country - 
+#else just show full list
 if country_choice_2 !=default_value:   
     city_list2 = [default_value] + sorted(flights.origin_city[flights.origin_country_full==country_choice_2].unique())
     city_choice_2 = st.sidebar.selectbox('Destination City', city_list2, index=0)
@@ -99,12 +126,18 @@ elif country_choice_2 != default_value:
 else:
     dest_filter = ~flights.origin_country_full.isnull()
 
-#filter the data based on both user's origin & dest choices - if none, just 
+#filter the data in the map based on both user's origin & dest choices - if none, just 
 #show the airport dots (base layer) and not any routes until locations are chosen
 if (city_choice_1 == default_value) & (country_choice_1==default_value) & (city_choice_2==default_value) & (country_choice_2==default_value):
     user_filtered_data = flights[flights.origin_country_full == 'dont show anything']
 else:
     user_filtered_data = flights[origin_filter][dest_filter][emissions_limit_filter]
+
+
+
+
+
+# Section 3: Map Setup
 
 #color of map routes
 rgb = [246, 174, 45, 120]
@@ -139,7 +172,7 @@ arc_layer = pdk.Layer(
     tooltip=True,
     wrapLongitude= True)
 
-
+#text that shows up when somebody rolls over a route on the map
 tooltip_text = {
     "html": "{origin_city}, {origin_country_full} and <br />{dest_city}, {dest_country_full} <br /> <b>Emissions: {formatted_co2e} kg ({formatted_tons} tons) per passenger</b>",
     "style": {"backgroundColor":"white",
@@ -154,10 +187,27 @@ deckchart = st.pydeck_chart(pdk.Deck(layers=[base_layer, arc_layer],
                                     initial_view_state= view_state,
                                     tooltip=tooltip_text))
 
+
+
+
+
+
+# Section 4: Building the User Options Table
+
+#the data is structured in a way that a single combination of cities will only show  up
+#once - that is, CHI-DEN and DEN-CHI do not both exist. However, for the user
+#experience, we need to simulate the actual 'origin' and 'destination' options they choose. 
+#this takes some data manipulation in the formula below. 
+
 @st.cache(ttl=5*60)
 def format_display_df_origin(row):
+    #origin city in the data
     origin= f'{row[1]}, {row[2]}'
+    #destination city in the data
     destination = f'{row[3]}, {row[4]}'
+    #if city choice 1 is chosen, and that city exists as an origin in the data, return
+    #the origin data. If it exists as a destination, return the destination data.
+    #Do the same for city choice 2 and country choices
     if city_choice_1 != default_value:
         if city_choice_1 in origin:
             return f'{origin}'
@@ -178,6 +228,9 @@ def format_display_df_origin(row):
             return f'{destination}'
         elif country_choice_2 in destination:
             return f'{origin}'
+
+#this is a very similar function but is all opposite because it's formatting our destination
+#choice, not the origin choice
 @st.cache(ttl=5*60)
 def format_display_df_dest(row):
     origin= f'{row[1]}, {row[2]}'
@@ -205,19 +258,19 @@ def format_display_df_dest(row):
 
 
 
-
+#break this section of the page into two columns
 col1, col2 = st.columns(2)
 with col1:
     st.subheader('If your route is flexible...')
+    #if nothing's been chosen, prompt them to choose
     if (city_choice_1 == default_value) & (country_choice_1==default_value) & (city_choice_2==default_value) & (country_choice_2==default_value):
         st.write('Choose a location on the left to explore your options!')
     else:
         if len(user_filtered_data)<5:
-            # flights filtered by the origin filter, where the continent is the same as the destination continent 
-            # get country of chosen destination city 
+            # get all the cities in the country of the city that the user chose and show those as alternative options
             if city_choice_2!=default_value:
                 dest_city_country = flights[(flights.dest_city == city_choice_2)].dest_country_full.unique()[0]
-            # if the destination country only has one city, get the city's continent and do the same thing
+            # if the destination country only has one city, get the city's continent show those cities as options
                 if len(flights[flights.dest_country_full == dest_city_country].dest_city.unique()) == 1:
                     st.write('Look for lower-emission flights to your chosen continent:')
                     dest_city_continent = flights[(flights.dest_city == city_choice_2)].dest_continent.unique()[0]
@@ -229,7 +282,7 @@ with col1:
                 lower_flights = flights[origin_filter][lower_flights_filter][['formatted_co2e','origin_city','origin_country_full', 'dest_city', 'dest_country_full']]
                 
             elif country_choice_2 != default_value:
-            # if the destination country only has one city, get the city's continent and do the same thing
+            # if the destination country only has one city, get the city's continent and show those cities as options
                 if len(flights[flights.dest_country_full == country_choice_2].dest_city.unique()) == 1:
                     st.write('Look for lower-emission flights to your chosen continent:')
                     dest_city_continent = flights[(flights.dest_country_full == country_choice_2)].dest_continent.unique()[0]
@@ -242,11 +295,13 @@ with col1:
             
             lower_flights.rename({'formatted_co2e':'CO2/Passenger', 'origin_city':'Origin', 'origin_country_full':'Origin Country','dest_city':'Dest. City',
                             'dest_country_full':'Dest. Country'}, axis=1, inplace=True)
+            #format the data so it's all ordered as the user chose - by origin and destination
             lower_flights['Route Origin'] = lower_flights.apply(format_display_df_origin, axis=1)
             lower_flights['Route Destination'] = lower_flights.apply(format_display_df_dest, axis=1)
             st.dataframe(lower_flights[['CO2/Passenger', 'Route Origin', 'Route Destination']].sort_values('CO2/Passenger', ascending=True)[:30])
 
-        elif len(user_filtered_data)>=5: #if the list of flights is longer than 5
+        elif len(user_filtered_data)>=5: 
+            #if the list of flights is longer than 5, just show all of the routes that match their chosen criteria
             st.write('See the lowest-emission flights with your criteria:')
             user_filtered_data_df = user_filtered_data[['formatted_co2e','origin_city','origin_country_full', 'dest_city', 'dest_country_full']]
             user_filtered_data_df.rename({'formatted_co2e':'CO2/Passenger', 'origin_city':'Origin', 'origin_country_full':'Origin Country','dest_city':'Dest. City',
@@ -258,6 +313,9 @@ with col1:
 
 
 
+
+
+# Section 5: Alternative actions
 with col2:
     st.subheader('If your destination is decided...')
     st.markdown('''

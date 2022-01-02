@@ -12,7 +12,7 @@ This app was designed for an invidual who is accustomed to flying, but doesn't t
 * Explore tips to reduce emissions, even once your flight is chosen
 
 ## Data  
-Emissions data was collected by first creating a dataset of all possible combinations of [large airport codes](https://datahub.io/core/airport-codes#resource-airport-codes), which had about 180,000 routes. I found the 'great circle' distance between each of the airports, which gave me the length of the route in miles. I then automated an API call to [Climatq.io](https://climatiq.io/) for every route, specifying the airport codes, flight distance, number of passengers, and calculation standard source (I used the EPA standards for all data). I was then able to join this emissions data with the latitude & longitude and insert it into a MongoDB database for storage. 
+Emissions data was collected by first creating a dataset of all possible combinations of [large airport codes](https://datahub.io/core/airport-codes#resource-airport-codes), which had about 180,000 routes. I found the 'great circle' distance between each of the airports, which gave me the length of the route in miles. I then automated an API call to [Climatiq.io](https://climatiq.io/) for every route, specifying the airport codes, flight distance, number of passengers, and calculation standard source (I used the EPA standards for all data). I was then able to join this emissions data with the latitude & longitude and insert it into a MongoDB database for storage. 
 
 ## Algorithms
 
@@ -28,4 +28,4 @@ Web App Deployment: Streamlit
 
 
 ## Communication  
-I completed a 5-minute presentation of the data pipeline and interactive app. Slides and visuals for this project are included in this repository. Future work includes
+I completed a 5-minute presentation of the data pipeline and interactive app. Slides and visuals for this project are included in this repository. Future work includes incorporating rail and bus data for geographies where it is available in order to provide travel alternatives. 
